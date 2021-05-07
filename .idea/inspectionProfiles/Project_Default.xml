@@ -1,0 +1,18 @@
+<component name="InspectionProjectProfileManager">
+  <profile version="1.0">
+    <option name="myName" value="Project Default" />
+    <inspection_tool class="PyUnresolvedReferencesInspection" enabled="true" level="WARNING" enabled_by_default="true">
+      <option name="ignoredIdentifiers">
+        <list>
+          <option value="PySide2.QtMultimedia.durationChanged.connect" />
+          <option value="PySide2.QtMultimedia.currentIndexChanged.connect" />
+          <option value="PySide2.QtWidgets.clicked.connect" />
+          <option value="PySide2.QtWidgets.triggered.connect" />
+          <option value="PySide2.QtWidgets.currentItemChanged.connect" />
+          <option value="PySide2.QtWidgets.textChanged.connect" />
+          <option value="PySide2.QtWidgets.mousePressEvent.connect" />
+        </list>
+      </option>
+    </inspection_tool>
+  </profile>
+</component>
