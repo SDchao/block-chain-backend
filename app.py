@@ -85,6 +85,10 @@ def issue_cert():
 
     # WIP
     # UPLOAD CODE HERE
-    h = random.sample(string.hexdigits, 32)
+    # TESTONLY
+    h = ""
+    for i in range(32):
+        h += random.choice(string.hexdigits)
+    # TESTONLY
 
-    db_operator.insert_new_cert_hash(data.stu_name)
+    db_operator.insert_new_cert_hash(data["stu_name"], h)
