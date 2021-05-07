@@ -1,4 +1,5 @@
 import functools
+import sqlite3
 
 from flask import Flask, jsonify, request, session
 
@@ -14,10 +15,14 @@ def ex_handle(func):
     def wrapper(*args, **kwargs):
         try:
             return func(*args, **kwargs)
-        except KeyError or TypeError:
-            return jsonify({"msg": "WRONG_ARG_FORMAT"})
-        except Exception as e:
-            return jsonify({"msg": str(e.args)})
+        except KeyError or TypeError as e:
+            return jsonify({"msg": "ERR_ARG_FORMAT", "args": str(e.args)})
+        except AssertionError as e:
+            return jsonify({"msg": "ERR_ARG_CONTENT", "args": str(e.args)})
+        except UserWarning as e:
+            return jsonify({"msg": e.args[0]})
+        except sqlite3.Error as e:
+            return jsonify({"msg": f"SQL_ERR_{e.__class__.__name__}", "args": str(e.args)})
 
     return wrapper
 
@@ -29,6 +34,7 @@ def login():
     level = db_operator.verify_id_key(data["id"], data["pri_key_sum"])
     if level != -1:
         session["id"] = data["id"]
+        session["level"] = level
         return jsonify({"msg": "SUCCESS"})
     else:
         return jsonify({"msg": "用户名或密码不正确"})
