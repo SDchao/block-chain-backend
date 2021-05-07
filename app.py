@@ -1,7 +1,5 @@
 import functools
-import random
 import sqlite3
-import string
 
 from flask import Flask, jsonify, request, session
 
@@ -31,13 +29,19 @@ def ex_handle(func):
         except AssertionError:
             return jsonify({"msg": "ERR_ARG_CHECK_FAIL"})
         except ErrorMessage as e:
-            return jsonify({"msg": e.args[0]})
+            if e.args:
+                return jsonify({"msg": e.args[0]})
+            else:
+                return jsonify({"msg": "ERR_UNKNOWN"})
         except UserPermissionError:
             return jsonify({"msg": "权限不足"})
         except NeedLoginError:
             return jsonify({"msg": "需要登录后操作"})
         except sqlite3.Error as e:
-            return jsonify({"msg": f"SQL_ERR_{e.__class__.__name__}", "args": str(e.args)})
+            if e.args:
+                return jsonify({"msg": f"SQL_ERR_{e.__class__.__name__}", "args": str(e.args)})
+            else:
+                return jsonify({"msg": f"SQL_ERR_{e.__class__.__name__}"})
 
     return wrapper
 
@@ -50,9 +54,9 @@ def login():
     if level != -1:
         session["id"] = data["id"]
         session["level"] = level
-        return jsonify({"msg": "SUCCESS"})
+        raise SuccessSignal
     else:
-        return jsonify({"msg": "用户名或密码不正确"})
+        raise ErrorMessage("用户名或密码错误")
 
 
 @app.route("/register", methods=["POST"])
@@ -60,22 +64,22 @@ def login():
 def register():
     data = request.get_json()
     db_operator.insert_new_user(data["id"], data["pri_key_sum"])
+    raise SuccessSignal
 
 
 @app.route("/logout", methods=["GET", "POST"])
 @ex_handle
 def logout():
     session.pop("id")
-    return jsonify({"msg": "SUCCESS"})
+    raise SuccessSignal
 
 
 @app.route("/verifyuser", methods=["GET", "POST"])
 @ex_handle
 def verify_user():
     if "id" in session:
-        return jsonify({"msg": "SUCCESS",
-                        "id": session["id"],
-                        "level": session["level"]})
+        raise SuccessSignal({"id": session["id"],
+                             "level": session["level"]})
     else:
         raise UserPermissionError
 
@@ -94,9 +98,9 @@ def issue_cert():
     # WIP
     # UPLOAD CODE HERE
     # TESTONLY
-    h = ""
-    for i in range(32):
-        h += random.choice(string.hexdigits)
+    h = "c0Cbb8f8c74bedD5CCa3Aeb6170420ed"
+    # for i in range(32):
+    #     h += random.choice(string.hexdigits)
     # TESTONLY
 
     db_operator.insert_new_cert_hash(data["stu_name"], h)
