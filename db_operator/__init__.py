@@ -1,7 +1,7 @@
 import sqlite3
 
 from logger import logger
-from types import ErrorMessage
+from custom_types import ErrorMessage
 
 conn = sqlite3.connect("main.db", check_same_thread=False)
 cursor = conn.cursor()

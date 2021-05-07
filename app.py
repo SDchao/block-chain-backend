@@ -7,7 +7,7 @@ from flask import Flask, jsonify, request, session
 
 import config
 import db_operator
-from types import NeedLoginError, UserPermissionError, ErrorMessage
+from custom_types import NeedLoginError, UserPermissionError, ErrorMessage
 
 app = Flask(__name__)
 app.secret_key = config.SECRET_KEY
