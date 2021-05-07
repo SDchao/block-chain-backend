@@ -8,3 +8,7 @@ class UserPermissionError(Exception):
 
 class ErrorMessage(Exception):
     pass
+
+
+class SuccessSignal(Exception):
+    pass

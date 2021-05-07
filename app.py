@@ -7,7 +7,7 @@ from flask import Flask, jsonify, request, session
 
 import config
 import db_operator
-from custom_types import NeedLoginError, UserPermissionError, ErrorMessage
+from custom_types import NeedLoginError, UserPermissionError, ErrorMessage, SuccessSignal
 
 app = Flask(__name__)
 app.secret_key = config.SECRET_KEY
@@ -18,6 +18,14 @@ def ex_handle(func):
     def wrapper(*args, **kwargs):
         try:
             return func(*args, **kwargs)
+        except SuccessSignal as e:
+            r = {"msg": "SUCCESS"}
+            if e.args:
+                d = e.args[0]
+                r.update(d)
+
+            return jsonify(r)
+
         except KeyError:
             return jsonify({"msg": "ERR_ARG_FORMAT"})
         except AssertionError:
@@ -92,3 +100,4 @@ def issue_cert():
     # TESTONLY
 
     db_operator.insert_new_cert_hash(data["stu_name"], h)
+    raise SuccessSignal

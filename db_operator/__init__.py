@@ -1,7 +1,7 @@
 import sqlite3
 
-from logger import logger
 from custom_types import ErrorMessage
+from logger import logger
 
 conn = sqlite3.connect("main.db", check_same_thread=False)
 cursor = conn.cursor()
@@ -53,7 +53,7 @@ def verify_id_key(id: str, pri_key_sum: str) -> int:
 
 def insert_new_cert_hash(id, cert_hash):
     logger.info(f"Inserting new cert_hash record {cert_hash}, belongs to {id}")
-    cursor.execute("select id from user where id = ?", (id))
+    cursor.execute("select id from user where id = ?", (id,))
     result = cursor.fetchone()
     if not result:
         logger.warning(f"User {id} do not exists")
@@ -62,6 +62,7 @@ def insert_new_cert_hash(id, cert_hash):
     try:
         cursor.execute("insert into user_hash (id, cert_hash) "
                        "VALUES (?,?)", (id, cert_hash))
+        conn.commit()
     except sqlite3.IntegrityError:
         logger.warning(f"User {id} already have cert {cert_hash}")
         raise ErrorMessage("已存在该证书")
