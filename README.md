@@ -152,7 +152,9 @@
 
 ```json5
 {
-  "msg": "SUCCESS"
+  "msg": "SUCCESS",
+  "id": "admin",
+  "level": 2
   // 若无效则为 EXPIRED
 }
 ```
