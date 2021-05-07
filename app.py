@@ -18,8 +18,8 @@ def ex_handle(func):
     def wrapper(*args, **kwargs):
         try:
             return func(*args, **kwargs)
-        except KeyError or AttributeError or ValueError as e:
-            return jsonify({"msg": "ERR_ARG_FORMAT", "args": str(e.args)})
+        except KeyError:
+            return jsonify({"msg": "ERR_ARG_FORMAT"})
         except AssertionError:
             return jsonify({"msg": "ERR_ARG_CHECK_FAIL"})
         except ErrorMessage as e:
