@@ -12,11 +12,10 @@ cursor.execute("create table if not exists user("
                "pri_key_sum varchar(32) not null,"
                "level integer default 0)")
 
-# CREATE USER_HASH TABLE
-cursor.execute("create table if not exists user_hash("
+# CREATE USER_CERT TABLE
+cursor.execute("create table if not exists user_cert("
                "id varchar(18), "
-               "cert_hash varchar(32) not null, "
-               "unique (id, cert_hash))")
+               "cert_id varchar(32) unique)")
 
 try:
     # ADD ADMIN ACCOUNT
@@ -51,8 +50,8 @@ def verify_id_key(id: str, pri_key_sum: str) -> int:
         return -1
 
 
-def insert_new_cert_hash(id, cert_hash):
-    logger.info(f"Inserting new cert_hash record {cert_hash}, belongs to {id}")
+def insert_new_cert_hash(id, cert_id):
+    logger.info(f"Inserting new cert {cert_id}, belongs to {id}")
     cursor.execute("select id from user where id = ?", (id,))
     result = cursor.fetchone()
     if not result:
@@ -60,9 +59,9 @@ def insert_new_cert_hash(id, cert_hash):
         raise ErrorMessage("用户不存在")
 
     try:
-        cursor.execute("insert into user_hash (id, cert_hash) "
-                       "VALUES (?,?)", (id, cert_hash))
+        cursor.execute("insert into user_cert (id, cert_id) "
+                       "VALUES (?,?)", (id, cert_id))
         conn.commit()
     except sqlite3.IntegrityError:
-        logger.warning(f"User {id} already have cert {cert_hash}")
+        logger.warning(f"User {id} already have cert {cert_id}")
         raise ErrorMessage("已存在该证书")

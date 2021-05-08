@@ -97,11 +97,6 @@ def issue_cert():
 
     # WIP
     # UPLOAD CODE HERE
-    # TESTONLY
-    h = "c0Cbb8f8c74bedD5CCa3Aeb6170420ed"
-    # for i in range(32):
-    #     h += random.choice(string.hexdigits)
-    # TESTONLY
 
-    db_operator.insert_new_cert_hash(data["stu_name"], h)
+    db_operator.insert_new_cert_hash(data["stu_name"], data["cert_id"])
     raise SuccessSignal
