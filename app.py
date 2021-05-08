@@ -105,16 +105,12 @@ def verify_user():
 @app.route("/issuecert", methods=["POST"])
 @ex_handle
 def issue_cert():
-    if "level" not in session:
-        raise NeedLoginError
-
-    if session["level"] < 1:
-        raise UserPermissionError
+    require_level(session, 1)
 
     data = request.get_json()
 
     # WIP
-    # UPLOAD CODE HERE
+    # FILE SYS HERE
     h = get_random_bytes(16).hex()
 
     if not user_manager.exist_user(data["stu_id"]):
