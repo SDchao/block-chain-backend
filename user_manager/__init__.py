@@ -9,7 +9,7 @@ def register(id: str, level: int = 0):
     logger.info(f"Registering new user {id}")
 
     pri_key_sum = crypto_operator.generate_new_key_pair(id)
-    db_operator.insert_new_user(id, pri_key_sum, level)
+    db_operator.insert_user(id, pri_key_sum, level)
 
 
 def exist_user(id: str) -> bool:

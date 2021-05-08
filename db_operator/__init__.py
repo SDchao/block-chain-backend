@@ -35,7 +35,7 @@ def check_user_exist(id: str) -> bool:
     return False
 
 
-def insert_new_user(id: str, pri_key_sum: str, level: int = 0):
+def insert_user(id: str, pri_key_sum: str, level: int = 0):
     logger.info(f"Submitting new user to database ({id})")
     try:
         cursor.execute("insert into user (id, pri_key_sum, level) "
@@ -59,7 +59,7 @@ def verify_id_key(id: str, pri_key_sum: str) -> int:
         return -1
 
 
-def insert_new_cert_hash(id, cert_id):
+def insert_cert(id, cert_id):
     logger.info(f"Inserting new cert {cert_id}, belongs to {id}")
     if not check_user_exist(id):
         logger.warning(f"User {id} do not exists")

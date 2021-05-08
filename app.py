@@ -108,9 +108,9 @@ def issue_cert():
     if not user_manager.exist_user(data["stu_id"]):
         user_manager.register(data["stu_id"])
 
-    enc_h = crypto_operator.user_encrypt(data["stu_id"], bytes.fromhex(h))
+    enc_h = crypto_operator.user_encrypt(data["stu_id"], h.encode("utf8"))
     print(enc_h)
     # FABRIC HERE
 
-    db_operator.insert_new_cert_hash(data["stu_id"], data["cert_id"])
+    db_operator.insert_cert(data["stu_id"], data["cert_id"])
     raise SuccessSignal
