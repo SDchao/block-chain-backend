@@ -49,6 +49,17 @@ def ex_handle(func):
     return wrapper
 
 
+def require_login(ses):
+    if "level" not in ses:
+        raise NeedLoginError
+
+
+def require_level(ses, min_level):
+    require_login()
+    if ses["level"] < min_level:
+        raise UserPermissionError
+
+
 @app.route("/login", methods=["POST"])
 @ex_handle
 def login():
