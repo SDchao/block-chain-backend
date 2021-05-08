@@ -85,3 +85,12 @@ def find_certs(id) -> list:
         return_val.append(r[0])
 
     return return_val
+
+
+def check_cert_exist(id, cert_id) -> bool:
+    logger.info(f"Checking cert {cert_id} of user {id}")
+
+    cursor.execute("select cert_id from user_cert where id = ? and cert_id = ?", (id, cert_id))
+    result = cursor.fetchone()
+
+    return bool(result)
