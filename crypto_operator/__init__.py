@@ -44,9 +44,9 @@ def generate_new_key_pair(id: str) -> str:
 
 
 def user_encrypt(id: str, content: bytes) -> bytes:
-    with open(f"user_keys/{id}.pem", "rb") as f:
-        pri_key = RSA.import_key(f.read())
+    with open(f"user_keys/{id}_pub.pem", "rb") as f:
+        key = RSA.import_key(f.read())
 
-    cipher_rsa = PKCS1_OAEP.new(pri_key)
+    cipher_rsa = PKCS1_OAEP.new(key)
     enc_content = cipher_rsa.encrypt(content)
     return enc_content
