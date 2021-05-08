@@ -72,3 +72,16 @@ def insert_cert(id, cert_id):
     except sqlite3.IntegrityError:
         logger.warning(f"User {id} already have cert {cert_id}")
         raise ErrorMessage("已存在该证书")
+
+
+def find_certs(id) -> list:
+    logger.info(f"Finding certs belong to {id}")
+
+    cursor.execute("select cert_id from user_cert where id=?", (id,))
+    results = cursor.fetchall()
+
+    return_val = []
+    for r in results:
+        return_val.append(r[0])
+
+    return return_val
