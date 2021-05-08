@@ -28,6 +28,10 @@ def generate_new_key_pair(id: str) -> str:
         raise ErrorMessage("用户已存在")
 
     key = RSA.generate(1024)
+
+    if not os.path.exists("user_keys"):
+        os.mkdir("user_keys")
+
     with open(f"user_keys/{id}.pem", "wb") as f:
         f.write(key.export_key())
 
