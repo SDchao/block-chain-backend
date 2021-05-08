@@ -88,6 +88,7 @@ def exist_user():
 @ex_handle
 def logout():
     session.pop("id")
+    session.pop("level")
     raise SuccessSignal
 
 
