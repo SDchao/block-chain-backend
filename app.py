@@ -55,7 +55,7 @@ def require_login(ses):
 
 
 def require_level(ses, min_level):
-    require_login()
+    require_login(ses)
     if ses["level"] < min_level:
         raise UserPermissionError
 
@@ -105,7 +105,7 @@ def verify_user():
 @app.route("/issuecert", methods=["POST"])
 @ex_handle
 def issue_cert():
-    require_level(session, 1)
+    require_level(session, 2)
 
     data = request.get_json()
 
@@ -122,3 +122,48 @@ def issue_cert():
 
     db_operator.insert_cert(data["stu_id"], data["cert_id"])
     raise SuccessSignal
+
+
+@app.route("/querycert", methods=["POST"])
+@ex_handle
+def query_cert():
+    data = request.get_json()
+    if "cert_id" in data:
+        query_cert_public(request)
+    else:
+        query_cert_self(request)
+
+
+def query_cert_self(request):
+    require_login(session)
+
+    data = request.get_json()
+    id = data["stu_id"]
+
+    # Query others' certs
+    if id != session["id"]:
+        require_level(session, 1)
+
+    cert_id_list = db_operator.find_certs(id)
+    res = []
+    for cert_id in cert_id_list:
+        # FABRIC HERE
+        # FILE SYSTEM HERE
+        res.append({"cert_id": cert_id})
+
+    raise SuccessSignal({"certs": res})
+
+
+def query_cert_public(request):
+    data = request.get_json()
+    cert_id = data["cert_id"]
+    stu_id = data["stu_id"]
+
+    if not db_operator.check_cert_exist(stu_id, cert_id):
+        raise ErrorMessage("证书不存在")
+
+    res = [{"cert_id": cert_id}]
+    # FABRIC HERE
+    # FILE SYSTEM HERE
+
+    raise SuccessSignal({"certs": res})
