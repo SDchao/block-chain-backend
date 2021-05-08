@@ -50,3 +50,12 @@ def user_encrypt(id: str, content: bytes) -> bytes:
     cipher_rsa = PKCS1_OAEP.new(key)
     enc_content = cipher_rsa.encrypt(content)
     return enc_content
+
+
+def user_decrypt(id: str, content: bytes) -> bytes:
+    with open(f"user_keys/{id}.pem", "rb") as f:
+        key = RSA.import_key(f.read())
+
+    cipher_rsa = PKCS1_OAEP.new(key)
+    dec_content = cipher_rsa.decrypt(content)
+    return dec_content
