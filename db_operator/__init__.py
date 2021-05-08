@@ -26,12 +26,21 @@ except sqlite3.IntegrityError:
 conn.commit()
 
 
-def insert_new_user(id: str, pri_key_sum: str):
+def check_user_exist(id: str) -> bool:
+    logger.info(f"checking if user {id} exist")
+    cursor.execute("select id from user where id = ?", (id,))
+    r = cursor.fetchone()
+    if r:
+        return True
+    return False
+
+
+def insert_new_user(id: str, pri_key_sum: str, level: int = 0):
     logger.info(f"Submitting new user to database ({id})")
     try:
-        cursor.execute("insert into user (id, pri_key_sum) "
-                       "values (?,?)",
-                       (id, pri_key_sum))
+        cursor.execute("insert into user (id, pri_key_sum, level) "
+                       "values (?,?,?)",
+                       (id, pri_key_sum, level))
         conn.commit()
     except sqlite3.IntegrityError:
         logger.warning(f"{id} has existed.")
@@ -52,9 +61,7 @@ def verify_id_key(id: str, pri_key_sum: str) -> int:
 
 def insert_new_cert_hash(id, cert_id):
     logger.info(f"Inserting new cert {cert_id}, belongs to {id}")
-    cursor.execute("select id from user where id = ?", (id,))
-    result = cursor.fetchone()
-    if not result:
+    if not check_user_exist(id):
         logger.warning(f"User {id} do not exists")
         raise ErrorMessage("用户不存在")
 

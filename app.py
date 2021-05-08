@@ -1,10 +1,13 @@
 import functools
 import sqlite3
 
+from Crypto.Random import get_random_bytes
 from flask import Flask, jsonify, request, session
 
 import config
+import crypto_operator
 import db_operator
+import user_manager
 from custom_types import NeedLoginError, UserPermissionError, ErrorMessage, SuccessSignal
 
 app = Flask(__name__)
@@ -59,12 +62,15 @@ def login():
         raise ErrorMessage("用户名或密码错误")
 
 
-@app.route("/register", methods=["POST"])
+@app.route("/existuser", methods=["POST"])
 @ex_handle
-def register():
-    data = request.get_json()
-    db_operator.insert_new_user(data["id"], data["pri_key_sum"])
-    raise SuccessSignal
+def exist_user():
+    exist = user_manager.exist_user(request["id"])
+
+    if exist:
+        raise SuccessSignal({"exist": 1})
+    else:
+        raise SuccessSignal({"exist": 0})
 
 
 @app.route("/logout", methods=["GET", "POST"])
@@ -97,6 +103,14 @@ def issue_cert():
 
     # WIP
     # UPLOAD CODE HERE
+    h = get_random_bytes(16).hex()
 
-    db_operator.insert_new_cert_hash(data["stu_name"], data["cert_id"])
+    if not user_manager.exist_user(data["stu_id"]):
+        user_manager.register(data["stu_id"])
+
+    enc_h = crypto_operator.user_encrypt(data["stu_id"], bytes.fromhex(h))
+    print(enc_h)
+    # FABRIC HERE
+
+    db_operator.insert_new_cert_hash(data["stu_id"], data["cert_id"])
     raise SuccessSignal
