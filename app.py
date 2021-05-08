@@ -99,7 +99,7 @@ def verify_user():
         raise SuccessSignal({"id": session["id"],
                              "level": session["level"]})
     else:
-        raise UserPermissionError
+        raise ErrorMessage("EXPIRED")
 
 
 @app.route("/issuecert", methods=["POST"])
