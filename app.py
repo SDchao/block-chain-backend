@@ -122,13 +122,17 @@ def issue_cert():
     upload_enc_data = base64.b64encode(enc_data)
     print(upload_enc_data)
 
-    db_operator.insert_cert(data["stu_id"], data["cert_id"])
+    conn = db_operator.insert_cert(data["stu_id"], data["cert_id"])
+    try:
+        # WIP
+        # FILE SYS HERE
 
-    # WIP
-    # FILE SYS HERE
+        # FABRIC HERE
 
-    # FABRIC HERE
-
+        conn.commit()
+    except BaseException as e:
+        conn.rollback()
+        raise e
     raise SuccessSignal
 
 
