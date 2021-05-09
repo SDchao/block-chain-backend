@@ -1,3 +1,4 @@
+import io
 from subprocess import getoutput
 
 from config import *
@@ -18,6 +19,12 @@ def get_state(key: str) -> str:
     cmd = SHELL_QUERY_PATH + "'{" + f'"Args":["Query","{key}"]' + "}'"
     result = getoutput(cmd)
     if result.find('Error') >= 0:
-        raise ErrorMessage(result)
+        f = io.StringIO(result)
+        err_msg = ""
+        for line in f.readlines():
+            if line.find("Error") >= 0:
+                err_msg += line
+        err_msg = err_msg[:-1]
+        raise ErrorMessage(err_msg)
     else:
         return result
