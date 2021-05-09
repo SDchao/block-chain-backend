@@ -141,9 +141,9 @@ def issue_cert():
 def query_cert():
     data = request.get_json()
     if "cert_id" in data:
-        query_cert_public(request)
+        query_cert_public(data)
     else:
-        query_cert_self(request)
+        query_cert_self(data)
 
 
 def get_cert(stu_id: str, cert_id: str):
@@ -157,10 +157,9 @@ def get_cert(stu_id: str, cert_id: str):
     return cert_json
 
 
-def query_cert_self(request):
+def query_cert_self(data):
     require_login(session)
 
-    data = request.get_json()
     id = data["stu_id"]
 
     # Query others' certs
@@ -176,8 +175,7 @@ def query_cert_self(request):
     raise SuccessSignal({"certs": res})
 
 
-def query_cert_public(request):
-    data = request.get_json()
+def query_cert_public(data):
     cert_id = data["cert_id"]
     stu_id = data["stu_id"]
 
