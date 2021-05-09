@@ -20,7 +20,8 @@ cursor.execute("create table if not exists user_cert("
 try:
     # ADD ADMIN ACCOUNT
     cursor.execute("insert into user (id, pri_key_sum, level) "
-                   "values ('admin', 'e10adc3949ba59abbe56e057f20f883e', '2')")
+                   "values ('admin', "
+                   "'8d969eef6ecad3c29a3a629280e686cf0c3f5d5a86aff3ca12020c923adc6c92', '2')")
 except sqlite3.IntegrityError:
     pass
 conn.commit()

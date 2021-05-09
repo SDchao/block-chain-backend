@@ -2,7 +2,7 @@ import io
 import os
 
 from Crypto.Cipher import PKCS1_OAEP, AES
-from Crypto.Hash import MD5
+from Crypto.Hash import SHA256
 from Crypto.PublicKey import RSA
 from Crypto.Random import get_random_bytes
 
@@ -22,7 +22,7 @@ def check_id_exist(id: str):
 
 def generate_new_key_pair(id: str) -> str:
     """
-    生产新密钥对，返回私钥的hex_md5摘要
+    生产新密钥对，返回私钥的hash
     :param id:
     """
     if check_id_exist(id):
@@ -40,7 +40,7 @@ def generate_new_key_pair(id: str) -> str:
     with open(f"user_keys/{id}_pub.pem", "wb") as f:
         f.write(key.public_key().export_key())
 
-    h = MD5.new()
+    h = SHA256.new()
     h.update(key.export_key())
     return h.hexdigest()
 
