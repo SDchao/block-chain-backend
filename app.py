@@ -167,3 +167,7 @@ def query_cert_public(request):
     # FILE SYSTEM HERE
 
     raise SuccessSignal({"certs": res})
+
+
+if __name__ == '__main__':
+    app.run()
