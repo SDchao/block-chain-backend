@@ -6,7 +6,7 @@ from logger import logger
 
 def put_state(key: str, value: str):
     logger.info(f"Putting state: {key} : {value}")
-    cmd = MODIFY + f'\'{"function":"changeStuInfo","Args":["{key}","{value}"]}\''
+    cmd = MODIFY + f'\'{"Args":["Modify","{key}","{value}"]}\''
     result = getoutput(cmd)
     if result.index('Chaincode invoke successful') < 0:
         raise ErrorMessage(result)
@@ -14,7 +14,7 @@ def put_state(key: str, value: str):
 
 def get_state(key: str) -> str:
     logger.info(f"Getting state: {key}")
-    cmd = QUERY + f'\'{"Args":["queryStuInfo","{key}"]}\''
+    cmd = QUERY + f'\'{"Args":["Query","{key}"]}\''
     result = getoutput(cmd)
     if result.index('Error') > 0:
         raise ErrorMessage(result)
