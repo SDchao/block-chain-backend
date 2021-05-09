@@ -6,22 +6,19 @@ from logger import logger
 
 def put_state(key: str, value: str):
     logger.info(f"Putting state: {key} : {value}")
-    cmd = MODIFY + f'\'{"Args":["Modify","{key}","{value}"]}\''
+    cmd = SHELL_MODIFY_PATH + \
+        "'{" + f'"Args":["Modify","{key}","{value}"]' + "}'"
     result = getoutput(cmd)
-    if result.index('Chaincode invoke successful') < 0:
+    if result.find('Chaincode invoke successful') < 0:
         raise ErrorMessage(result)
 
 
 def get_state(key: str) -> str:
     logger.info(f"Getting state: {key}")
-    cmd = QUERY + f'\'{"Args":["Query","{key}"]}\''
+    cmd = SHELL_QUERY_PATH + \
+        "'{" + f'"Args":["Query","{key}"]' + "}'"
     result = getoutput(cmd)
-    if result.index('Error') > 0:
+    if result.find('Error') >= 0:
         raise ErrorMessage(result)
     else:
         return result
-
-
-if __name__ == '__main__':
-    put_state("test", "123test123")
-    assert get_state("test") == "123test123"

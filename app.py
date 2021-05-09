@@ -7,6 +7,7 @@ from flask import Flask, jsonify, request, session
 import config
 import crypto_operator
 import db_operator
+import fabric_operator
 import user_manager
 from custom_types import NeedLoginError, UserPermissionError, ErrorMessage, SuccessSignal
 
