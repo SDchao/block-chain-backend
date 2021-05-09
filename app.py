@@ -151,7 +151,7 @@ def get_cert(stu_id: str, cert_id: str):
     # FILE SYSTEM HERE
     raw_cert = ''
     enc_cert = base64.b64decode(raw_cert)
-    cert = crypto_operator.user_decrypt(stu_id)
+    cert = crypto_operator.user_decrypt(stu_id, enc_cert)
     cert_str = cert.decode("utf8")
     cert_json = json.loads(cert_str)
     return cert_json
