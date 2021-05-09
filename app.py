@@ -116,8 +116,6 @@ def issue_cert():
     if not user_manager.exist_user(data["stu_id"]):
         user_manager.register(data["stu_id"])
 
-    enc_h = crypto_operator.user_encrypt(data["stu_id"], h.encode("utf8"))
-    print(enc_h)
     # FABRIC HERE
 
     db_operator.insert_cert(data["stu_id"], data["cert_id"])
@@ -167,3 +165,21 @@ def query_cert_public(request):
     # FILE SYSTEM HERE
 
     raise SuccessSignal({"certs": res})
+
+
+@app.route("/modifycert", methods=["POST"])
+@ex_handle
+def modify_cert():
+    require_level(session, 2)
+
+    data = request.get_json()
+    stu_id = data["stu_id"]
+    cert_id = data["cert_id"]
+
+    if not db_operator.check_cert_exist(stu_id, cert_id):
+        raise ErrorMessage("证书不存在")
+
+    # FILE SYSTEM HERE
+    # FABRIC HERE
+
+    raise SuccessSignal
