@@ -59,7 +59,7 @@ def verify_id_key(id: str, pri_key_sum: str) -> int:
         return -1
 
 
-def insert_cert(id, cert_id):
+def insert_cert(id, cert_id) -> sqlite3.Connection:
     logger.info(f"Inserting new cert {cert_id}, belongs to {id}")
     if not check_user_exist(id):
         logger.warning(f"User {id} do not exists")
@@ -68,9 +68,9 @@ def insert_cert(id, cert_id):
     try:
         cursor.execute("insert into user_cert (id, cert_id) "
                        "VALUES (?,?)", (id, cert_id))
-        conn.commit()
+        return conn
     except sqlite3.IntegrityError:
-        logger.warning(f"User {id} already have cert {cert_id}")
+        logger.warning(f"Already have cert {cert_id}")
         raise ErrorMessage("已存在该证书")
 
 
@@ -94,3 +94,9 @@ def check_cert_exist(id, cert_id) -> bool:
     result = cursor.fetchone()
 
     return bool(result)
+
+
+def remove_cert(id, cert_id):
+    logger.info(f"Removing cert {cert_id} of user {id}")
+
+    cursor.execute("delete from user_cert where id = ? and cert_id = ?", (id, cert_id))
