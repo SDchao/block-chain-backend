@@ -65,6 +65,8 @@ def require_level(ses, min_level):
 @ex_handle
 def login():
     data = request.get_json()
+    # DATA CHECK HERE
+
     level = db_operator.verify_id_key(data["id"], data["pri_key_sum"])
     if level != -1:
         session["id"] = data["id"]
@@ -140,6 +142,9 @@ def issue_cert():
 @ex_handle
 def query_cert():
     data = request.get_json()
+
+    # DATA CHECK HERE
+
     if "cert_id" in data:
         query_cert_public(data)
     else:
@@ -194,6 +199,8 @@ def modify_cert():
     require_level(session, 2)
 
     data = request.get_json()
+    # DATA CHECK HERE
+
     stu_id = data["stu_id"]
     cert_id = data["cert_id"]
 
