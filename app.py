@@ -1,10 +1,12 @@
+import base64
 import functools
+import json
 import sqlite3
 
-from Crypto.Random import get_random_bytes
 from flask import Flask, jsonify, request, session
 
 import config
+import crypto_operator
 import db_operator
 import user_manager
 from custom_types import NeedLoginError, UserPermissionError, ErrorMessage, SuccessSignal
@@ -26,7 +28,7 @@ def ex_handle(func):
 
             return jsonify(r)
 
-        except KeyError:
+        except KeyError or TypeError:
             return jsonify({"msg": "ERR_ARG_FORMAT"})
         except AssertionError:
             return jsonify({"msg": "ERR_ARG_CHECK_FAIL"})
@@ -108,16 +110,25 @@ def issue_cert():
 
     data = request.get_json()
 
+    # DATA CHECK HERE
+
+    stu_id = data["stu_id"]
+    # Encrypt data
+    if not user_manager.exist_user(stu_id):
+        user_manager.register(stu_id)
+
+    data_bytes = json.dumps(data).encode("utf8")
+    enc_data = crypto_operator.user_encrypt(stu_id, data_bytes)
+    upload_enc_data = base64.b64encode(enc_data)
+    print(upload_enc_data)
+
+    db_operator.insert_cert(data["stu_id"], data["cert_id"])
+
     # WIP
     # FILE SYS HERE
-    h = get_random_bytes(16).hex()
-
-    if not user_manager.exist_user(data["stu_id"]):
-        user_manager.register(data["stu_id"])
 
     # FABRIC HERE
 
-    db_operator.insert_cert(data["stu_id"], data["cert_id"])
     raise SuccessSignal
 
 
@@ -129,6 +140,17 @@ def query_cert():
         query_cert_public(request)
     else:
         query_cert_self(request)
+
+
+def get_cert(stu_id: str, cert_id: str):
+    # FABRIC HERE
+    # FILE SYSTEM HERE
+    raw_cert = ''
+    enc_cert = base64.b64decode(raw_cert)
+    cert = crypto_operator.user_decrypt(stu_id)
+    cert_str = cert.decode("utf8")
+    cert_json = json.loads(cert_str)
+    return cert_json
 
 
 def query_cert_self(request):
@@ -144,8 +166,7 @@ def query_cert_self(request):
     cert_id_list = db_operator.find_certs(id)
     res = []
     for cert_id in cert_id_list:
-        # FABRIC HERE
-        # FILE SYSTEM HERE
+        # cert = get_cert(id, cert_id)
         res.append({"cert_id": cert_id})
 
     raise SuccessSignal({"certs": res})
@@ -159,9 +180,8 @@ def query_cert_public(request):
     if not db_operator.check_cert_exist(stu_id, cert_id):
         raise ErrorMessage("证书不存在")
 
+    # cert = get_cert(id, cert_id)
     res = [{"cert_id": cert_id}]
-    # FABRIC HERE
-    # FILE SYSTEM HERE
 
     raise SuccessSignal({"certs": res})
 
