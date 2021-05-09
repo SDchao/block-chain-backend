@@ -5,7 +5,6 @@ from Crypto.Random import get_random_bytes
 from flask import Flask, jsonify, request, session
 
 import config
-import crypto_operator
 import db_operator
 import user_manager
 from custom_types import NeedLoginError, UserPermissionError, ErrorMessage, SuccessSignal
@@ -178,8 +177,11 @@ def modify_cert():
 
     if not db_operator.check_cert_exist(stu_id, cert_id):
         raise ErrorMessage("证书不存在")
-
     # FILE SYSTEM HERE
     # FABRIC HERE
 
     raise SuccessSignal
+
+
+if __name__ == '__main__':
+    app.run()
