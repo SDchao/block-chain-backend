@@ -2,7 +2,7 @@ import base64
 import functools
 import json
 import sqlite3
-
+import re
 from flask import Flask, jsonify, request, session
 
 import config
@@ -65,7 +65,9 @@ def require_level(ses, min_level):
 @ex_handle
 def login():
     data = request.get_json()
-    # DATA CHECK HERE
+    # data check here
+    assert re.fullmatch(r'[^#$%&*;:|/\\\'\"]+', data["id"])
+    assert re.fullmatch(r'[^#$%&*;:|/\\\'\"]+', data["pri_key_sum"])
 
     level = db_operator.verify_id_key(data["id"], data["pri_key_sum"])
     if level != -1:
@@ -109,10 +111,15 @@ def verify_user():
 @ex_handle
 def issue_cert():
     require_level(session, 2)
-
-    data = request.get_json()
-
     # DATA CHECK HERE
+    data = request.get_json()
+    assert re.fullmatch(r'[^#$%&*;:|/\\\'\"]+', data["stu_id"])
+    assert re.fullmatch(r'[^#$%&*;:|/\\\'\"]+', data["stu_name"])
+    assert re.fullmatch(r'[^#$%&*;:|/\\\'\"]+', data["cert_id"])
+    assert re.fullmatch(r'[^#$%&*;:|/\\\'\"]+', data["school_name"])
+    assert re.fullmatch(r'[^#$%&*;:|/\\\'\"]+', data["degree"])
+    assert re.fullmatch(r'[^#$%&*;:|/\\\'\"]+', data["edu_system"])
+    assert re.fullmatch(r'[^#$%&*;:|/\\\'\"]+', data["stu_major"])
 
     stu_id = data["stu_id"]
     # Encrypt data
@@ -142,8 +149,8 @@ def issue_cert():
 @ex_handle
 def query_cert():
     data = request.get_json()
-
     # DATA CHECK HERE
+    assert re.fullmatch(r'[^#$%&*;:|/\\\'\"]+', data["stu_id"])
 
     if "cert_id" in data:
         query_cert_public(data)
@@ -165,13 +172,13 @@ def get_cert(stu_id: str, cert_id: str):
 def query_cert_self(data):
     require_login(session)
 
-    id = data["stu_id"]
+    stu_id = data["stu_id"]
 
     # Query others' certs
-    if id != session["id"]:
+    if stu_id != session["id"]:
         require_level(session, 1)
 
-    cert_id_list = db_operator.find_certs(id)
+    cert_id_list = db_operator.find_certs(stu_id)
     res = []
     for cert_id in cert_id_list:
         # cert = get_cert(id, cert_id)
@@ -200,6 +207,13 @@ def modify_cert():
 
     data = request.get_json()
     # DATA CHECK HERE
+    assert re.fullmatch(r'[^#$%&*;:|/\\\'\"]+', data["stu_id"])
+    assert re.fullmatch(r'[^#$%&*;:|/\\\'\"]+', data["stu_name"])
+    assert re.fullmatch(r'[^#$%&*;:|/\\\'\"]+', data["cert_id"])
+    assert re.fullmatch(r'[^#$%&*;:|/\\\'\"]+', data["school_name"])
+    assert re.fullmatch(r'[^#$%&*;:|/\\\'\"]+', data["degree"])
+    assert re.fullmatch(r'[^#$%&*;:|/\\\'\"]+', data["edu_system"])
+    assert re.fullmatch(r'[^#$%&*;:|/\\\'\"]+', data["stu_major"])
 
     stu_id = data["stu_id"]
     cert_id = data["cert_id"]
