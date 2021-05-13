@@ -1,15 +1,16 @@
 import base64
 import functools
 import json
-import sqlite3
 import re
+import sqlite3
+
 from flask import Flask, jsonify, request, session
 
-import fabric_operator
-import oss_manager
 import config
 import crypto_operator
 import db_operator
+import fabric_operator
+import oss_manager
 import user_manager
 from custom_types import NeedLoginError, UserPermissionError, ErrorMessage, SuccessSignal
 
@@ -187,7 +188,7 @@ def query_cert_self(data):
     cert_id_list = db_operator.find_certs(stu_id)
     res = []
     for cert_id in cert_id_list:
-        cert = get_cert(id, cert_id)
+        cert = get_cert(stu_id, cert_id)
         res.append(cert)
 
     raise SuccessSignal({"certs": res})
@@ -200,7 +201,7 @@ def query_cert_public(data):
     if not db_operator.check_cert_exist(stu_id, cert_id):
         raise ErrorMessage("证书不存在")
 
-    cert = get_cert(id, cert_id)
+    cert = get_cert(stu_id, cert_id)
     res = [cert]
 
     raise SuccessSignal({"certs": res})
