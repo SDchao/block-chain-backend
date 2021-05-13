@@ -219,12 +219,11 @@ def modify_cert():
 
     if not db_operator.check_cert_exist(stu_id, cert_id):
         raise ErrorMessage("证书不存在")
-    try:
-        obj_name = fabric_operator.get_state(cert_id)
-        new_obj_name = oss_manager.modify_cert(obj_name, enc_data)
-        fabric_operator.put_state(cert_id, new_obj_name)
-    except BaseException as e:
-        raise e
+
+    obj_name = fabric_operator.get_state(cert_id)
+    new_obj_name = oss_manager.modify_cert(obj_name, enc_data)
+    fabric_operator.put_state(cert_id, new_obj_name)
+
     raise SuccessSignal
 
 
