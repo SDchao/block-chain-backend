@@ -5,6 +5,8 @@ import sqlite3
 import re
 from flask import Flask, jsonify, request, session
 
+import fabric_operator
+import oss_manager
 import config
 import crypto_operator
 import db_operator
@@ -135,9 +137,9 @@ def issue_cert():
     try:
         # WIP
         # FILE SYS HERE
-
+        url = oss_manager.uploadFileFromBytes(data["cert_id"], upload_enc_data)
         # FABRIC HERE
-
+        fabric_operator.put_state(data["cert_id"], url)
         conn.commit()
     except BaseException as e:
         conn.rollback()
@@ -161,7 +163,11 @@ def query_cert():
 def get_cert(stu_id: str, cert_id: str):
     # FABRIC HERE
     # FILE SYSTEM HERE
-    raw_cert = ''
+    try:
+        url = fabric_operator.get_state(cert_id)
+        raw_cert = oss_manager.downloadFile(cert_id, url)
+    except BaseException as e:
+        raise e
     enc_cert = base64.b64decode(raw_cert)
     cert = crypto_operator.user_decrypt(stu_id, enc_cert)
     cert_str = cert.decode("utf8")
@@ -181,8 +187,8 @@ def query_cert_self(data):
     cert_id_list = db_operator.find_certs(stu_id)
     res = []
     for cert_id in cert_id_list:
-        # cert = get_cert(id, cert_id)
-        res.append({"cert_id": cert_id})
+        cert = get_cert(id, cert_id)
+        res.append(cert)
 
     raise SuccessSignal({"certs": res})
 
@@ -194,8 +200,8 @@ def query_cert_public(data):
     if not db_operator.check_cert_exist(stu_id, cert_id):
         raise ErrorMessage("证书不存在")
 
-    # cert = get_cert(id, cert_id)
-    res = [{"cert_id": cert_id}]
+    cert = get_cert(id, cert_id)
+    res = [cert]
 
     raise SuccessSignal({"certs": res})
 
@@ -218,11 +224,20 @@ def modify_cert():
     stu_id = data["stu_id"]
     cert_id = data["cert_id"]
 
+    data_bytes = json.dumps(data).encode("utf8")
+    enc_data = crypto_operator.user_encrypt(stu_id, data_bytes)
+    upload_enc_data = base64.b64encode(enc_data)
+    print(upload_enc_data)
+
     if not db_operator.check_cert_exist(stu_id, cert_id):
         raise ErrorMessage("证书不存在")
     # FILE SYSTEM HERE
     # FABRIC HERE
-
+    try:
+        url = oss_manager.modifyFile(cert_id, upload_enc_data)
+        fabric_operator.put_state(cert_id, url)
+    except BaseException as e:
+        raise e
     raise SuccessSignal
 
 
