@@ -69,10 +69,10 @@ def require_level(ses, min_level):
 def login():
     data = request.get_json()
     # data check here
-    assert re.fullmatch(r'[^#$%&*;:|/\\\'\"]+', data["id"])
+    assert re.fullmatch(r'[^#$%&*;:|/\\\'\"]+', data["stu_id"])
     assert re.fullmatch(r'[^#$%&*;:|/\\\'\"]+', data["pri_key_sum"])
 
-    level = db_operator.verify_id_key(data["id"], data["pri_key_sum"])
+    level = db_operator.verify_id_key(data["stu_id"], data["pri_key_sum"])
     if level != -1:
         session["id"] = data["id"]
         session["level"] = level
