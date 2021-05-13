@@ -1,33 +1,13 @@
-from minio import Minio
-from minio.error import S3Error
-import time
-import hashlib
-import io
-
-client = Minio("127.0.0.1:9002",
-               "AKIAIOSFODNN7EXAMPLE",
-               "wJalrXUtnFEMI/K7MDENG/bPxRfiCYEXAMPLEKEY",
-               secure=False)
+from .basic import uploadFileFromBytes, downloadFile, modifyFile
 
 
-def uploadFileFromBytes(bucket_name: str, data: bytes):
-    if not client.bucket_exists(bucket_name):
-        client.make_bucket(bucket_name)
-    obj = io.BytesIO(data)
-    hashFileName = hashlib.sha256(str(time.time()).encode()).hexdigest()
-    obj_name = client.put_object(bucket_name, hashFileName, obj, len(data)).object_name
-    return obj_name
+def upload_cert(data: bytes) -> str:
+    return uploadFileFromBytes("CERTS", data)
 
 
-def downloadFile(bucket_name: str, objname: str):
-    response = client.get_object(bucket_name, objname)
-    return response.read()
+def download_cert(obj_name: str) -> bytes:
+    return downloadFile("CERTS", obj_name)
 
 
-def modifyFile(bucket_name: str, data: bytes):
-    for obj in client.list_objects(bucket_name):
-        client.remove_object(bucket_name, obj.object_name)
-    obj = io.BytesIO(data)
-    hashFileName = hashlib.sha256(str(time.time()).encode()).hexdigest()
-    obj_name = client.put_object(bucket_name, hashFileName, obj, len(data)).object_name
-    return obj_name
+def modify_cert(obj_name: str, data: bytes) -> str:
+    return modifyFile("CERTS", obj_name, data)

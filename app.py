@@ -1,4 +1,3 @@
-import base64
 import functools
 import json
 import re
@@ -131,16 +130,11 @@ def issue_cert():
 
     data_bytes = json.dumps(data).encode("utf8")
     enc_data = crypto_operator.user_encrypt(stu_id, data_bytes)
-    upload_enc_data = base64.b64encode(enc_data)
-    print(upload_enc_data)
 
     conn = db_operator.insert_cert(data["stu_id"], data["cert_id"])
     try:
-        # WIP
-        # FILE SYS HERE
-        url = oss_manager.uploadFileFromBytes(data["cert_id"], upload_enc_data)
-        # FABRIC HERE
-        fabric_operator.put_state(data["cert_id"], url)
+        obj_name = oss_manager.upload_cert(enc_data)
+        fabric_operator.put_state(data["cert_id"], obj_name)
         conn.commit()
     except BaseException as e:
         conn.rollback()
@@ -162,14 +156,9 @@ def query_cert():
 
 
 def get_cert(stu_id: str, cert_id: str):
-    # FABRIC HERE
-    # FILE SYSTEM HERE
-    try:
-        url = fabric_operator.get_state(cert_id)
-        raw_cert = oss_manager.downloadFile(cert_id, url)
-    except BaseException as e:
-        raise e
-    enc_cert = base64.b64decode(raw_cert)
+    obj_name = fabric_operator.get_state(cert_id)
+    enc_cert = oss_manager.download_cert(obj_name)
+
     cert = crypto_operator.user_decrypt(stu_id, enc_cert)
     cert_str = cert.decode("utf8")
     cert_json = json.loads(cert_str)
@@ -227,16 +216,13 @@ def modify_cert():
 
     data_bytes = json.dumps(data).encode("utf8")
     enc_data = crypto_operator.user_encrypt(stu_id, data_bytes)
-    upload_enc_data = base64.b64encode(enc_data)
-    print(upload_enc_data)
 
     if not db_operator.check_cert_exist(stu_id, cert_id):
         raise ErrorMessage("证书不存在")
-    # FILE SYSTEM HERE
-    # FABRIC HERE
     try:
-        url = oss_manager.modifyFile(cert_id, upload_enc_data)
-        fabric_operator.put_state(cert_id, url)
+        obj_name = fabric_operator.get_state(cert_id)
+        new_obj_name = oss_manager.modify_cert(obj_name, enc_data)
+        fabric_operator.put_state(cert_id, new_obj_name)
     except BaseException as e:
         raise e
     raise SuccessSignal
