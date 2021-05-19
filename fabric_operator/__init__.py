@@ -1,5 +1,8 @@
 import io
 from subprocess import getoutput
+import re
+import binascii
+import json
 
 from config import *
 from custom_types import *
@@ -28,3 +31,21 @@ def get_state(key: str) -> str:
         raise ErrorMessage(err_msg)
     else:
         return result
+
+
+def get_history(key: str):
+    logger.info(f"Getting history: {key}")
+    cmd = SHELL_GET_HISTORY_PATH + "'{" + f'"Args":["GetHistory","{key}"]' + "}'"
+    result = getoutput(cmd)
+    result = result.replace('\\', '')
+    result = re.findall(r'{.+?}', result)
+    if not result:
+        raise ErrorMessage("No history info found!")
+    final_res = []
+    for element in result:
+        element = json.loads(element)
+        element["timestamp"] = element['timestamp']['seconds']
+        element['value'] = binascii.a2b_base64(element['value']).decode()
+        final_res.append(element)
+        logger.info(f'history info: {element}')
+    return final_res

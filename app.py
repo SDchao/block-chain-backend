@@ -227,5 +227,18 @@ def modify_cert():
     raise SuccessSignal
 
 
+@app.route("/history", methods=["POST"])
+@ex_handle
+def get_history():
+    require_level(session, 2)
+
+    data = request.get_json()
+    assert re.fullmatch(r'[^#$%&*;:|/\\\'\"]+', data["cert_id"])
+    cert_id = data["cert_id"]
+    history_info = fabric_operator.get_history(cert_id)
+
+    raise SuccessSignal({"history": history_info})
+
+
 if __name__ == '__main__':
     app.run()
