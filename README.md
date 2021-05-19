@@ -98,6 +98,42 @@
 }
 ```
 
+## 查询历史 /history GET
+仅管理员可查看
+### 参数
+```json5
+{
+  "cert_id": "123"
+}
+```
+### 返回 json
+```json5
+{
+  "msg": "SUCCESS",
+  "history" : [
+    {
+      "timestamp": 1621413696,
+      "tx_id": "ef2",
+      "value": "asdjicfhnduifnhasc"
+    },
+    {
+      "timestamp": 1621413696,
+      "tx_id": "ef2",
+      "value": "asdjicfhnduifnhasc"
+    }
+  ]
+}
+```
+
+## 哈希转证书内容 /hashtocert POST
+### 参数 json
+```json5
+{
+  "hash": "asdhasiohdsaiudhsa"
+}
+```
+### 返回值 json
+容器内的json内容
 # 登录功能
 
 ## 登录 /login
