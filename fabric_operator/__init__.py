@@ -38,7 +38,7 @@ def get_history(key: str):
     cmd = SHELL_GET_HISTORY_PATH + "'{" + f'"Args":["GetHistory","{key}"]' + "}'"
     result = getoutput(cmd)
     result = result.replace('\\', '')
-    result = re.findall(r'{.+?}', result)
+    result = re.findall(r'{.+?}}', result)
     if not result:
         raise ErrorMessage("No history info found!")
     final_res = []
