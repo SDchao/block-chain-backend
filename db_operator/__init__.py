@@ -1,5 +1,7 @@
 import sqlite3
 
+from pysmx.SM3 import Hash_sm3
+
 from custom_types import ErrorMessage
 from logger import logger
 
@@ -21,7 +23,7 @@ try:
     # ADD ADMIN ACCOUNT
     cursor.execute("insert into user (id, pri_key_sum, level) "
                    "values ('admin', "
-                   "'8d969eef6ecad3c29a3a629280e686cf0c3f5d5a86aff3ca12020c923adc6c92', '2')")
+                   "'89ee969e96ea6e0eb517db2bb20ddd206ec58facf3669ff71eaca8035a9a99c7', '2')")
 except sqlite3.IntegrityError:
     pass
 conn.commit()
@@ -50,6 +52,7 @@ def insert_user(id: str, pri_key_sum: str, level: int = 0):
 
 def verify_id_key(id: str, pri_key_sum: str) -> int:
     logger.info(f"Verifying user {id} with pri_key_sum")
+    pri_key_sum = Hash_sm3(pri_key_sum)
     cursor.execute("select level from user where id = ? and pri_key_sum = ?", (id, pri_key_sum))
     result_tuple = cursor.fetchone()
     if result_tuple:

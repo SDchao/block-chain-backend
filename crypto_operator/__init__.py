@@ -5,6 +5,7 @@ from Crypto.Cipher import PKCS1_OAEP, AES
 from Crypto.Hash import SHA256
 from Crypto.PublicKey import RSA
 from Crypto.Random import get_random_bytes
+from pysmx.SM3 import Hash_sm3
 
 from custom_types import ErrorMessage
 from logger import logger
@@ -42,7 +43,8 @@ def generate_new_key_pair(id: str) -> str:
 
     h = SHA256.new()
     h.update(key.export_key())
-    return h.hexdigest()
+    sm3_hash = Hash_sm3(h.hexdigest())
+    return sm3_hash
 
 
 def user_encrypt(id: str, content: bytes) -> bytes:
