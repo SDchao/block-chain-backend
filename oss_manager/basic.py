@@ -2,6 +2,7 @@ import hashlib
 import io
 import time
 
+from pysmx.SM3 import Hash_sm3
 from minio import Minio
 
 client = Minio("127.0.0.1:9002",
@@ -14,7 +15,8 @@ def uploadFileFromBytes(bucket_name: str, data: bytes):
     if not client.bucket_exists(bucket_name):
         client.make_bucket(bucket_name)
     obj = io.BytesIO(data)
-    hashFileName = hashlib.sha256(str(time.time()).encode()).hexdigest()
+    # hashFileName = hashlib.sha256(str(time.time()).encode()).hexdigest()
+    hashFileName = Hash_sm3(str(time.time()).encode())
     obj_name = client.put_object(bucket_name, hashFileName, obj, len(data)).object_name
     return obj_name
 
