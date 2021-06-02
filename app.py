@@ -4,6 +4,7 @@ import re
 import sqlite3
 
 from flask import Flask, jsonify, request, session
+from flask_cors import CORS
 
 import config
 import crypto_operator
@@ -15,6 +16,8 @@ from custom_types import NeedLoginError, UserPermissionError, ErrorMessage, Succ
 
 app = Flask(__name__)
 app.secret_key = config.SECRET_KEY
+
+CORS(app)
 
 
 def ex_handle(func):
